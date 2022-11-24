@@ -4,6 +4,12 @@ let cliente = {  //1
     pedido: []
 };
 
+const categorias = {
+    1: "Comida",
+    2: "Bebida",
+    3: "Postre"
+}
+
 const btnGuardarCliente = document.querySelector("#guardar-cliente");  //2
 btnGuardarCliente.addEventListener("click", guardarCliente);
 
@@ -56,10 +62,50 @@ function mostrarSecciones() {   //6
     seccionesOcultas.forEach(seccion => seccion.classList.remove("d-none"));
 }
 
-function obtenerPlatillos() {  //7
+function obtenerPlatillos() {  //7  consulta la API
     const url = "http://localhost:4000/platillos";
 
-    fetch(url)
-    .then(respuesta => console.log(respuesta))
+    fetch(url).then(respuesta => respuesta.json())
+    .then(resultado => mostrarPlatillos(resultado))
     .catch(error => console.log(error));
+}
+
+function mostrarPlatillos(platillos) {  //8
+    const contenido = document.querySelector("#platillos .contenido");
+
+    platillos.forEach(platillo => {
+        const row = document.createElement("div");
+        row.classList.add("row", "py-3", "border-top");
+
+        const nombre = document.createElement("div");
+        nombre.classList.add("col-md-4");
+        nombre.textContent = platillo.nombre;
+
+        const precio = document.createElement("div");
+        precio.classList.add("col-md-3", "fw-bold");
+        precio.textContent = `$${platillo.precio}`;
+
+        const categoria = document.createElement("div");
+        categoria.classList.add("col-md-3",);
+        categoria.textContent = categorias[platillo.categoria];
+
+        const inputCantidad = document.createElement("input");
+        inputCantidad.type = "number";
+        inputCantidad.min = 0;
+        inputCantidad.value = 0;
+        inputCantidad.id = `producto-${platillo.id}`;
+        inputCantidad.classList.add("form-control");
+
+        const agregar = document.createElement("div");
+        agregar.classList.add("col-md-2");
+        agregar.appendChild(inputCantidad);
+
+
+        row.appendChild(nombre);
+        row.appendChild(precio);
+        row.appendChild(categoria);
+        row.appendChild(agregar);
+        contenido.appendChild(row);
+        
+    })
 }
