@@ -43,7 +43,6 @@ function guardarCliente() {  //3
     //Asigna los datos del formulario al cliente  //4
     cliente = {...cliente, mesa, hora};
     
-    
     //Oculta el modal con un metodo de bootstrap  //5
     const modalFormulario = document.querySelector("#formulario"); 
     const modalBootstrap = bootstrap.Modal.getInstance(modalFormulario);
@@ -101,7 +100,6 @@ function mostrarPlatillos(platillos) {  //8
             const cantidad = parseInt(inputCantidad.value);
             agregarPlatillo({...platillo, cantidad});
             
-            
         }
 
         const agregar = document.createElement("div");
@@ -118,8 +116,35 @@ function mostrarPlatillos(platillos) {  //8
     })
 }
 
-function agregarPlatillo(producto) {
+function agregarPlatillo(producto) {  // 10
+    //Extrae el pedido actual
+    let {pedido} = cliente;
     
+    //Revisa que la cantidad sea mayor a cero
+    if(producto.cantidad > 0) {
+
+        //Comprueba si el elemento ya existe en el array
+        if(pedido.some(articulo => articulo.id === producto.id)){
+            //El articulo ya existe, actualiza la cantidad
+            const pedidoActualizado = pedido.map(articulo => {
+                if(articulo.id === producto.id) {
+                    articulo.cantidad = producto.cantidad;
+                }
+                return articulo;
+            });
+            //se asigna el nuevo array a cliente.pedido
+            cliente.pedido = [...pedidoActualizado]
+
+        }else {
+            //El articulo no existe lo agrega al array de pedido
+            cliente.pedido = [...pedido, producto]
+
+        }
+       
+
+    } else {
+        console.log("no es mayor a cero");
+    }
    
-    console.log(producto);
+    console.log(cliente.pedido);
 }
