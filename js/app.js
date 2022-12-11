@@ -144,8 +144,15 @@ function agregarPlatillo(producto) {  // 10
 
     //Limpiar el codigo HTML anterior
     limpiarHtml();
-    //Mostrar el resumen:
-    actualizarResumen();
+
+    if(cliente.pedido.length) {
+        //Mostrar el resumen:
+        actualizarResumen();
+    }else {
+        mensajePedidoVacio();
+    }
+
+    
 };
 
 function actualizarResumen() {  //11
@@ -265,6 +272,10 @@ function actualizarResumen() {  //11
 
     //agrega al contenido:
     contenido.appendChild(resumen);
+
+    //Mostrar el formulario de propinas:
+    formularioPropinas();
+
 };
 
 function limpiarHtml() {
@@ -277,11 +288,212 @@ function limpiarHtml() {
 function eliminarProducto(id) {
     const {pedido} = cliente;
     const resultado = pedido.filter(articulo=> articulo.id !== id);
-        cliente.pedido = [...resultado];   
-        console.log(cliente.pedido);
+        cliente.pedido = [...resultado];     
 
     //Limpiar el codigo HTML anterior
     limpiarHtml();
-    //Mostrar el resumen:
-    actualizarResumen();
+
+    if(cliente.pedido.length) {
+        //Mostrar el resumen:
+        actualizarResumen();
+    }else {
+        mensajePedidoVacio();
+    }
+
+    //Cuando elimino un platillo regresa el input a cero:
+    const platilloEliminado = `#producto-${id}`;
+    const inputEliminado = document.querySelector(platilloEliminado);
+    inputEliminado.value = 0;
 };
+
+function mensajePedidoVacio() {
+    const contenido = document.querySelector("#resumen .contenido");
+    
+    const texto = document.createElement("p");
+    texto.classList.add("text-center");
+    texto.textContent = "Añade los Platillos del Pedido"
+
+    contenido.appendChild(texto);
+};
+
+function formularioPropinas() {
+    const contenido = document.querySelector("#resumen .contenido");
+
+    const formulario = document.createElement("div");
+    formulario.classList.add("col-md-6","formulario");
+
+    const divFormulario = document.createElement("div");
+    divFormulario.classList.add("card", "py-4", "px-3", "shadow");
+
+    const heading = document.createElement("h4");
+    heading.classList.add("my-4", "fst-italic","text-center");
+    heading.textContent = "Propina:";
+
+    //Radio button 0%:
+    const radio0 = document.createElement("input");
+    radio0.type = "radio";
+    radio0.name = "propina";
+    radio0.value = "0";
+    radio0.classList.add("form-check-input");
+    radio0.onclick = calcularPropina;
+
+    const radio0Label = document.createElement("label");
+    radio0Label.textContent = "0%";
+    radio0Label.classList.add("form-check-label");
+
+    const radio0Div = document.createElement("div");
+    radio0Div.classList.add("form-check", "fw-bold");
+
+    radio0Div.appendChild(radio0);
+    radio0Div.appendChild(radio0Label);
+    
+    //Radio button 10%:
+    const radio10 = document.createElement("input");
+    radio10.type = "radio";
+    radio10.name = "propina";
+    radio10.value = "10";
+    radio10.classList.add("form-check-input");
+    radio10.onclick = calcularPropina;
+
+    const radio10Label = document.createElement("label");
+    radio10Label.textContent = "10%";
+    radio10Label.classList.add("form-check-label");
+
+    const radio10Div = document.createElement("div");
+    radio10Div.classList.add("form-check", "fw-bold");
+
+    radio10Div.appendChild(radio10);
+    radio10Div.appendChild(radio10Label);
+
+
+    //Radio button 25%:
+    const radio25 = document.createElement("input");
+    radio25.type = "radio";
+    radio25.name = "propina";
+    radio25.value = "25";
+    radio25.classList.add("form-check-input");
+    radio25.onclick = calcularPropina;
+
+    const radio25Label = document.createElement("label");
+    radio25Label.textContent = "25%";
+    radio25Label.classList.add("form-check-label");
+
+    const radio25Div = document.createElement("div");
+    radio25Div.classList.add("form-check", "fw-bold");
+
+    radio25Div.appendChild(radio25);
+    radio25Div.appendChild(radio25Label);
+
+     //Radio button 50%:
+     const radio50 = document.createElement("input");
+     radio50.type = "radio";
+     radio50.name = "propina";
+     radio50.value = "50";
+     radio50.classList.add("form-check-input");
+     radio50.onclick = calcularPropina;
+ 
+     const radio50Label = document.createElement("label");
+     radio50Label.textContent = "50%";
+     radio50Label.classList.add("form-check-label");
+ 
+     const radio50Div = document.createElement("div");
+     radio50Div.classList.add("form-check", "fw-bold");
+ 
+     radio50Div.appendChild(radio50);
+     radio50Div.appendChild(radio50Label);
+
+    //Agregar al Div principal:
+    divFormulario.appendChild(heading);
+    divFormulario.appendChild(radio0Div);
+    divFormulario.appendChild(radio10Div);
+    divFormulario.appendChild(radio25Div);
+    divFormulario.appendChild(radio50Div);
+    
+    //Agregar al formulario:
+    formulario.appendChild(divFormulario);
+
+    contenido.appendChild(formulario);
+};
+
+    function calcularPropina() {
+        const {pedido} = cliente;
+        let subtotal = 0;
+
+        //Calcular el subtotal a pagar:
+        pedido.forEach(articulo => {
+            subtotal += articulo.cantidad * articulo.precio;
+        });
+
+        //Selecciona el radio button de propina:
+        const propinaSeleccionada = document.querySelector("[name='propina']:checked").value;
+        
+        //Calcula propina:
+        const propina = ((subtotal * parseInt(propinaSeleccionada))/100);
+       
+        //Calcula el total a pagar(propina+subtotal):
+        const total = subtotal+propina;
+        
+        mostrarTotal(subtotal, total, propina);
+};
+
+function mostrarTotal(subtotal, total, propina) {
+    const divTotales = document.createElement("div");
+    divTotales.classList.add("total-pagar");
+    
+    //Subtotal:
+    const subtotalParrafo = document.createElement("p");
+    subtotalParrafo.classList.add("fs-4","fw-bold","mt-5");
+    subtotalParrafo.textContent = "Subtotal Consumo: ";
+
+    const subtotalSpan = document.createElement("span");
+    subtotalSpan.classList.add("fw-normal");
+    subtotalSpan.textContent = `$${subtotal}`;
+
+    subtotalParrafo.appendChild(subtotalSpan);
+
+    
+
+
+    //Propina:
+    const propinaParrafo = document.createElement("p");
+    propinaParrafo.classList.add("fs-4","fw-bold","mt-1");
+    propinaParrafo.textContent = "Propina: ";
+
+    const propinaSpan = document.createElement("span");
+    propinaSpan.classList.add("fw-normal");
+    propinaSpan.textContent = `$${propina}`;
+
+    propinaParrafo.appendChild(propinaSpan);
+
+    
+
+
+     //Total:
+     const totalParrafo = document.createElement("p");
+     totalParrafo.classList.add("fs-4","fw-bold","mt-1");
+     totalParrafo.textContent = "Total a Pagar: ";
+ 
+     const totalSpan = document.createElement("span");
+     totalSpan.classList.add("fw-normal");
+     totalSpan.textContent = `$${total}`;
+ 
+     totalParrafo.appendChild(totalSpan);
+
+
+     //Eliminar el ultimo resultado:
+     const totalPagarDiv = document.querySelector(".total-pagar");
+     if(totalPagarDiv) {
+        totalPagarDiv.remove();
+     }
+ 
+     divTotales.appendChild(subtotalParrafo);
+     divTotales.appendChild(propinaParrafo);
+     divTotales.appendChild(totalParrafo);
+
+    const formulario = document.querySelector(".formulario > div");
+    formulario.appendChild(divTotales);
+};
+
+//****************** NOTA *******************
+//Para simular el servidor de los platillos:
+//en la terminal escribir: json-server --watch db.json --port 4000
